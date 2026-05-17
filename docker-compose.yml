@@ -1,0 +1,40 @@
+services:
+  web:
+    image: nginx
+    container_name: zerotrust-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: zerotrust-api
+    environment:
+      DB_HOST: db
+      DB_NAME: zerotrust
+      DB_USER: zeroadmin
+      DB_PASSWORD: strongpassword123
+      API_KEY: mysecurekey123
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: zerotrust-db
+    environment:
+      POSTGRES_DB: zerotrust
+      POSTGRES_USER: zeroadmin
+      POSTGRES_PASSWORD: strongpassword123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

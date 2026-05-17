@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zero Trust Cloud Lab</title>
+
+    <style>
+        body {
+            background: #0f1117;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        h1 {
+            font-size: 60px;
+        }
+
+        input {
+            padding: 12px;
+            width: 300px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #00ff88;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .card {
+            background: #1b1f27;
+            margin: 20px auto;
+            padding: 20px;
+            width: 60%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Zero Trust Cloud Lab</h1>
+
+    <p>AWS + Docker + Flask + PostgreSQL</p>
+
+    <input id="message" placeholder="Enter secure event">
+    <button onclick="addMessage()">Add Event</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function loadData() {
+            const response = await fetch('/api/status');
+            const data = await response.json();
+
+            let html = '';
+
+            data.forEach(item => {
+                html += `
+                    <div class="card">
+                        <h3>${item.message}</h3>
+                        <p>ID: ${item.id}</p>
+                        <p>${item.created_at}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        async function addMessage() {
+            const message = document.getElementById('message').value;
+
+            await fetch('/api/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'mysecurekey123'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            document.getElementById('message').value = '';
+
+            loadData();
+        }
+
+        loadData();
+    </script>
+
+</body>
+</html>
